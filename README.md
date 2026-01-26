@@ -7,10 +7,13 @@ An Obsidian plugin that generates weekly review notes using an LLM (supports Oll
 - **Automatic note selection**: Scans notes modified during a configurable review period
 - **Flexible time periods**: Current week, current month, last 7 days, last 30 days, or custom range
 - **LLM-powered summaries**: Generates a summary, notable work highlights, and exactly 3 priorities
+- **Note summarization**: Summarize any individual note with a single command
 - **Configurable folders**: Scan specific folders or your entire vault
 - **New file every run**: Creates a unique review note each time
 
 ## Usage
+
+### Generate a Weekly Review
 
 1. Open the command palette (Cmd/Ctrl + P)
 2. Run "Weekly Review: Generate review"
@@ -19,6 +22,15 @@ An Obsidian plugin that generates weekly review notes using an LLM (supports Oll
 
 The plugin creates a new note in your configured output folder with the format:
 `YYYY-MM-DD Weekly Review.md`
+
+### Summarize a Note
+
+1. Open the note you want to summarize
+2. Open the command palette (Cmd/Ctrl + P)
+3. Run "Weekly Review: Summarize this note"
+4. A `# Summary` section will be added at the top of the note (after frontmatter if present)
+
+Running the command again will replace the existing summary.
 
 ## Configuration
 

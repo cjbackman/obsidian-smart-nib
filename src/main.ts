@@ -10,6 +10,7 @@ import { buildPrompt } from "./prompt";
 import { callLLM, LLMError } from "./llmClient";
 import { renderReviewNote, getWeekStart } from "./render";
 import { resolveFilename } from "./filenames";
+import { buildSummaryPrompt, insertSummarySection } from "./summarize";
 
 export default class ReviewGeneratorPlugin extends Plugin {
 	settings: ReviewSettings = DEFAULT_SETTINGS;
@@ -22,6 +23,13 @@ export default class ReviewGeneratorPlugin extends Plugin {
 			id: "generate-review",
 			name: "Generate review",
 			callback: () => this.generateReview(),
+		});
+
+		// Add the summarize note command
+		this.addCommand({
+			id: "summarize-note",
+			name: "Summarize this note",
+			editorCallback: (editor, ctx) => this.summarizeCurrentNote(ctx.file),
 		});
 
 		// Add settings tab
@@ -169,5 +177,37 @@ export default class ReviewGeneratorPlugin extends Plugin {
 			);
 			modal.open();
 		});
+	}
+
+	private async summarizeCurrentNote(file: TFile | null) {
+		if (!file) {
+			new Notice("No active file to summarize.");
+			return;
+		}
+
+		try {
+			new Notice("Summarizing note...");
+
+			const content = await this.app.vault.read(file);
+			const title = file.basename;
+
+			const prompt = buildSummaryPrompt(content, title);
+			const summary = await callLLM(this.settings.llm, prompt);
+
+			const updatedContent = insertSummarySection(content, summary);
+
+			await this.app.vault.modify(file, updatedContent);
+
+			new Notice("Summary added to note.");
+		} catch (error) {
+			if (error instanceof LLMError) {
+				new Notice(`LLM Error: ${error.message}`);
+			} else if (error instanceof Error) {
+				new Notice(`Error: ${error.message}`);
+			} else {
+				new Notice("An unexpected error occurred.");
+			}
+			console.error("Note summarization failed:", error);
+		}
 	}
 }
