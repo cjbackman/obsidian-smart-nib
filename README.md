@@ -8,6 +8,7 @@ An Obsidian plugin that generates weekly review notes using an LLM (supports Oll
 - **Flexible time periods**: Current week, current month, last 7 days, last 30 days, or custom range
 - **LLM-powered summaries**: Generates a summary, notable work highlights, and exactly 3 priorities
 - **Note summarization**: Summarize any individual note with a single command
+- **Sprinkle AI**: Select text, provide a prompt, and insert LLM-generated content above your selection
 - **Configurable folders**: Scan specific folders or your entire vault
 - **New file every run**: Creates a unique review note each time
 
@@ -31,6 +32,16 @@ The plugin creates a new note in your configured output folder with the format:
 4. A `# Summary` section will be added at the top of the note (after frontmatter if present)
 
 Running the command again will replace the existing summary.
+
+### Sprinkle AI
+
+1. Select text in any note
+2. Right-click and choose "Sprinkle AI"
+3. Write your instruction in the prompt modal (e.g. "Add a bullet list of key takeaways")
+4. Review the LLM response:
+   - **Accept** — inserts the response above your selected text
+   - **Retry** — re-opens the prompt (pre-filled) so you can edit it and try again
+   - **Reject** — discards the response
 
 ## Configuration
 
