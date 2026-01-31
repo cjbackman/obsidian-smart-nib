@@ -1,6 +1,6 @@
-# Weekly Review Generator
+# Smart Nib
 
-An Obsidian plugin that generates weekly review notes using an LLM (supports Ollama and compatible APIs).
+An LLM-powered writing assistant for Obsidian (supports Ollama and compatible APIs).
 
 ## Features
 
@@ -17,7 +17,7 @@ An Obsidian plugin that generates weekly review notes using an LLM (supports Oll
 ### Generate a Weekly Review
 
 1. Open the command palette (Cmd/Ctrl + P)
-2. Run "Weekly Review: Generate review"
+2. Run "Smart Nib: Generate review"
 3. Select your review period (if prompted)
 4. Wait for the LLM to generate your review
 
@@ -28,7 +28,7 @@ The plugin creates a new note in your configured output folder with the format:
 
 1. Open the note you want to summarize
 2. Open the command palette (Cmd/Ctrl + P)
-3. Run "Weekly Review: Summarize this note"
+3. Run "Smart Nib: Summarize this note"
 4. A `# Summary` section will be added at the top of the note (after frontmatter if present)
 
 Running the command again will replace the existing summary.

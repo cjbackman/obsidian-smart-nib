@@ -1,9 +1,9 @@
 {
-	"id": "review-generator",
-	"name": "Review Generator",
+	"id": "smart-nib",
+	"name": "Smart Nib",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Creates a summary and suggests priorities based on files changed.",
+	"description": "An LLM-powered writing assistant — generate reviews, summarize notes, and sprinkle AI into your text.",
 	"author": "Carl-Johan Backman",
 	"authorUrl": "https://github.com/cjbackman",
 	"isDesktopOnly": false

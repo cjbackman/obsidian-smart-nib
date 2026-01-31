@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-review-generator",
+	"name": "obsidian-smart-nib",
 	"version": "1.0.0",
-	"description": "Obsidian plugin that generates weekly review notes using LLM",
+	"description": "An LLM-powered writing assistant for Obsidian — generate reviews, summarize notes, and sprinkle AI into your text.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
