@@ -56,9 +56,15 @@ export interface EvidencePack {
 }
 
 /**
+ * Supported LLM API providers.
+ */
+export type LLMProvider = "ollama" | "openai";
+
+/**
  * LLM API configuration.
  */
 export interface LLMConfig {
+	provider: LLMProvider;
 	baseUrl: string;
 	endpointPath: string;
 	model: string;
@@ -101,6 +107,7 @@ export const DEFAULT_SETTINGS: ReviewSettings = {
 	defaultPeriodPreset: "current_week",
 	promptForPeriodOnRun: true,
 	llm: {
+		provider: "ollama",
 		baseUrl: "http://localhost:11434",
 		endpointPath: "/api/chat",
 		model: "llama3.1",

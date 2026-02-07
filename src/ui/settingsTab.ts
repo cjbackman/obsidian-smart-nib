@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type ReviewGeneratorPlugin from "../main";
-import type { PeriodPreset } from "../types";
+import type { LLMProvider, PeriodPreset } from "../types";
 
 const PERIOD_PRESETS: { value: PeriodPreset; label: string }[] = [
 	{ value: "current_week", label: "Current week" },
@@ -122,6 +122,31 @@ export class ReviewSettingsTab extends PluginSettingTab {
 
 		// LLM Configuration Section
 		new Setting(containerEl).setName("Model configuration").setHeading();
+
+		new Setting(containerEl)
+			.setName("Provider")
+			.setDesc("The model API provider to use.")
+			.addDropdown((dropdown) => {
+				dropdown.addOption("ollama", "Ollama");
+				dropdown.addOption("openai", "Open AI");
+				dropdown.setValue(this.plugin.settings.llm.provider);
+				dropdown.onChange(async (value) => {
+					const provider = value as LLMProvider;
+					this.plugin.settings.llm.provider = provider;
+					if (provider === "openai") {
+						this.plugin.settings.llm.baseUrl = "https://api.openai.com";
+						this.plugin.settings.llm.endpointPath = "/v1/chat/completions";
+						this.plugin.settings.llm.apiKeyHeaderName = "Authorization";
+					} else {
+						this.plugin.settings.llm.baseUrl = "http://localhost:11434";
+						this.plugin.settings.llm.endpointPath = "/api/chat";
+						this.plugin.settings.llm.apiKeyHeaderName = undefined;
+						this.plugin.settings.llm.apiKeyHeaderValue = undefined;
+					}
+					await this.plugin.saveSettings();
+					this.display();
+				});
+			});
 
 		new Setting(containerEl)
 			.setName("Base URL")

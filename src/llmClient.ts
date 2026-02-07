@@ -1,5 +1,5 @@
 import { requestUrl, type RequestUrlParam, type RequestUrlResponse } from "obsidian";
-import type { LLMConfig } from "./types";
+import type { LLMConfig, LLMProvider } from "./types";
 
 /**
  * Custom error class for LLM-related errors.
@@ -18,6 +18,73 @@ interface OllamaChatResponse {
 	message?: {
 		content?: string;
 	};
+}
+
+/**
+ * OpenAI chat API response structure.
+ */
+interface OpenAIChatResponse {
+	choices?: Array<{
+		message?: {
+			content?: string;
+		};
+	}>;
+}
+
+/**
+ * Build the request body for the given provider.
+ */
+export function buildRequestBody(
+	config: LLMConfig,
+	prompt: string
+): Record<string, unknown> {
+	const base = {
+		model: config.model,
+		messages: [{ role: "user", content: prompt }],
+		stream: false,
+	};
+
+	if (config.provider === "openai") {
+		return {
+			...base,
+			temperature: config.temperature,
+			max_tokens: config.maxTokens,
+		};
+	}
+
+	// Ollama (default)
+	return {
+		...base,
+		options: {
+			temperature: config.temperature,
+			num_predict: config.maxTokens,
+		},
+	};
+}
+
+/**
+ * Parse the response content based on provider format.
+ */
+export function parseResponseContent(
+	provider: LLMProvider,
+	json: unknown
+): string {
+	if (provider === "openai") {
+		const data = json as OpenAIChatResponse;
+		const content = data.choices?.[0]?.message?.content;
+		if (typeof content !== "string") {
+			throw new LLMError("Unexpected response format: missing choices[0].message.content");
+		}
+		return content;
+	}
+
+	// Ollama (default)
+	const data = json as OllamaChatResponse;
+	const content = data.message?.content;
+	if (typeof content !== "string") {
+		throw new LLMError("Unexpected response format: missing message content");
+	}
+	return content;
 }
 
 /**
@@ -61,15 +128,7 @@ export async function callLLM(config: LLMConfig, prompt: string): Promise<string
 		headers[config.apiKeyHeaderName] = config.apiKeyHeaderValue;
 	}
 
-	const body = JSON.stringify({
-		model: config.model,
-		messages: [{ role: "user", content: prompt }],
-		stream: false,
-		options: {
-			temperature: config.temperature,
-			num_predict: config.maxTokens,
-		},
-	});
+	const body = JSON.stringify(buildRequestBody(config, prompt));
 
 	// Attempt with one retry on network failure
 	let lastError: Error | null = null;
@@ -87,19 +146,7 @@ export async function callLLM(config: LLMConfig, prompt: string): Promise<string
 				throw new LLMError(`LLM request failed: ${response.status}`);
 			}
 
-			let data: OllamaChatResponse;
-			try {
-				data = response.json as OllamaChatResponse;
-			} catch {
-				throw new LLMError("Failed to parse LLM response as JSON");
-			}
-
-			const content = data.message?.content;
-			if (typeof content !== "string") {
-				throw new LLMError("Unexpected response format: missing message content");
-			}
-
-			return content;
+			return parseResponseContent(config.provider, response.json);
 		} catch (error) {
 			if (error instanceof LLMError) {
 				// Don't retry LLM errors (HTTP errors, parse errors)
