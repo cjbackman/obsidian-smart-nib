@@ -201,17 +201,18 @@ export class ReviewSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("API key header value")
+			.setName("API key")
 			.setDesc("Optional value for the API key header.")
-			.addText((text) =>
+			.addText((text) => {
+				text.inputEl.type = "password";
 				text
 					.setPlaceholder("")
 					.setValue(this.plugin.settings.llm.apiKeyHeaderValue ?? "")
 					.onChange(async (value) => {
 						this.plugin.settings.llm.apiKeyHeaderValue = value || undefined;
 						await this.plugin.saveSettings();
-					})
-			);
+					});
+			});
 
 		new Setting(containerEl)
 			.setName("Temperature")
