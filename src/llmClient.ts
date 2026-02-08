@@ -125,7 +125,11 @@ export async function callLLM(config: LLMConfig, prompt: string): Promise<string
 	};
 
 	if (config.apiKeyHeaderName && config.apiKeyHeaderValue) {
-		headers[config.apiKeyHeaderName] = config.apiKeyHeaderValue;
+		let headerValue = config.apiKeyHeaderValue;
+		if (config.apiKeyHeaderName === "Authorization" && !headerValue.startsWith("Bearer ")) {
+			headerValue = `Bearer ${headerValue}`;
+		}
+		headers[config.apiKeyHeaderName] = headerValue;
 	}
 
 	const body = JSON.stringify(buildRequestBody(config, prompt));

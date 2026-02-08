@@ -168,6 +168,46 @@ describe("callLLM", () => {
 			expect(result).toBe("OpenAI response");
 		});
 
+		it("prepends 'Bearer ' to API key when Authorization header is used", async () => {
+			const configWithRawKey: LLMConfig = {
+				...openaiConfig,
+				apiKeyHeaderValue: "sk-test",
+			};
+			mockRequestUrl.mockResolvedValueOnce({
+				status: 200,
+				json: { choices: [{ message: { content: "Response" } }] },
+			} as RequestUrlResponse);
+
+			await callLLM(configWithRawKey, "Test prompt");
+
+			expect(mockRequestUrl).toHaveBeenCalledWith(
+				expect.objectContaining({
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+					headers: expect.objectContaining({
+						Authorization: "Bearer sk-test",
+					}),
+				})
+			);
+		});
+
+		it("does not double-prepend 'Bearer ' when already present", async () => {
+			mockRequestUrl.mockResolvedValueOnce({
+				status: 200,
+				json: { choices: [{ message: { content: "Response" } }] },
+			} as RequestUrlResponse);
+
+			await callLLM(openaiConfig, "Test prompt");
+
+			expect(mockRequestUrl).toHaveBeenCalledWith(
+				expect.objectContaining({
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+					headers: expect.objectContaining({
+						Authorization: "Bearer sk-test",
+					}),
+				})
+			);
+		});
+
 		it("throws on missing choices in OpenAI response", async () => {
 			mockRequestUrl.mockResolvedValueOnce({
 				status: 200,
