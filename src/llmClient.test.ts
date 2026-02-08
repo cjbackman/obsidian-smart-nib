@@ -102,14 +102,28 @@ describe("callLLM", () => {
 			mockRequestUrl.mockResolvedValueOnce({
 				status: 500,
 				json: {},
-			} as RequestUrlResponse);
+				text: "",
+			} as unknown as RequestUrlResponse);
 
 			await expect(callLLM(baseConfig, "Test prompt")).rejects.toThrow(LLMError);
 			mockRequestUrl.mockResolvedValueOnce({
 				status: 500,
 				json: {},
-			} as RequestUrlResponse);
+				text: "",
+			} as unknown as RequestUrlResponse);
 			await expect(callLLM(baseConfig, "Test prompt")).rejects.toThrow(/500/);
+		});
+
+		it("includes response body in error message for HTTP errors", async () => {
+			mockRequestUrl.mockResolvedValueOnce({
+				status: 400,
+				json: { error: { message: "The model `llama3.1` does not exist" } },
+				text: '{"error":{"message":"The model `llama3.1` does not exist"}}',
+			} as unknown as RequestUrlResponse);
+
+			await expect(callLLM(baseConfig, "Test prompt")).rejects.toThrow(
+				/The model `llama3.1` does not exist/
+			);
 		});
 
 		it("throws LLMError when response missing message content", async () => {
@@ -151,8 +165,9 @@ describe("callLLM", () => {
 			const calls = mockRequestUrl.mock.calls as [RequestUrlParam][];
 			const callArgs = calls[0]![0];
 			const body = JSON.parse(callArgs.body as string) as Record<string, unknown>;
-			expect(body.temperature).toBe(0.5);
-			expect(body.max_tokens).toBe(2000);
+			expect(body.max_completion_tokens).toBe(2000);
+			expect(body).not.toHaveProperty("temperature");
+			expect(body).not.toHaveProperty("max_tokens");
 			expect(body).not.toHaveProperty("options");
 			expect(body.stream).toBe(false);
 		});
@@ -230,11 +245,12 @@ describe("callLLM", () => {
 			expect(body).not.toHaveProperty("max_tokens");
 		});
 
-		it("builds OpenAI format with top-level params", () => {
+		it("builds OpenAI format without temperature", () => {
 			const openaiConfig: LLMConfig = { ...baseConfig, provider: "openai" };
 			const body = buildRequestBody(openaiConfig, "hello");
-			expect(body.temperature).toBe(0.2);
-			expect(body.max_tokens).toBe(1000);
+			expect(body.max_completion_tokens).toBe(1000);
+			expect(body).not.toHaveProperty("temperature");
+			expect(body).not.toHaveProperty("max_tokens");
 			expect(body).not.toHaveProperty("options");
 		});
 	});
@@ -285,7 +301,8 @@ describe("callLLM", () => {
 			mockRequestUrl.mockResolvedValueOnce({
 				status: 400,
 				json: {},
-			} as RequestUrlResponse);
+				text: "",
+			} as unknown as RequestUrlResponse);
 
 			await expect(callLLM(baseConfig, "Test prompt")).rejects.toThrow(LLMError);
 			expect(mockRequestUrl).toHaveBeenCalledTimes(1);

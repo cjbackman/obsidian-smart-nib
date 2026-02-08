@@ -108,7 +108,8 @@ export default class ReviewGeneratorPlugin extends Plugin {
 					};
 				} else {
 					new Notice(
-						"Custom period selected but no dates configured. Please update settings."
+						"Custom period selected but no dates configured. Please update settings.",
+						0
 					);
 					return;
 				}
@@ -129,7 +130,7 @@ export default class ReviewGeneratorPlugin extends Plugin {
 			);
 
 			if (notes.length === 0) {
-				new Notice("No notes found for the selected period.");
+				new Notice("No notes found for the selected period.", 0);
 				return;
 			}
 
@@ -176,11 +177,11 @@ export default class ReviewGeneratorPlugin extends Plugin {
 			}
 		} catch (error) {
 			if (error instanceof LLMError) {
-				new Notice(`LLM Error: ${error.message}`);
+				new Notice(`LLM Error: ${error.message}`, 0);
 			} else if (error instanceof Error) {
-				new Notice(`Error: ${error.message}`);
+				new Notice(`Error: ${error.message}`, 0);
 			} else {
-				new Notice("An unexpected error occurred.");
+				new Notice("An unexpected error occurred.", 0);
 			}
 			console.error("Review generation failed:", error);
 		}
@@ -253,11 +254,11 @@ export default class ReviewGeneratorPlugin extends Plugin {
 			}
 		} catch (error) {
 			if (error instanceof LLMError) {
-				new Notice(`LLM Error: ${error.message}`);
+				new Notice(`LLM Error: ${error.message}`, 0);
 			} else if (error instanceof Error) {
-				new Notice(`Error: ${error.message}`);
+				new Notice(`Error: ${error.message}`, 0);
 			} else {
-				new Notice("An unexpected error occurred.");
+				new Notice("An unexpected error occurred.", 0);
 			}
 			console.error("Sprinkle AI failed:", error);
 		}
@@ -265,7 +266,7 @@ export default class ReviewGeneratorPlugin extends Plugin {
 
 	private async summarizeCurrentNote(file: TFile | null) {
 		if (!file) {
-			new Notice("No active file to summarize.");
+			new Notice("No active file to summarize.", 0);
 			return;
 		}
 
@@ -285,11 +286,11 @@ export default class ReviewGeneratorPlugin extends Plugin {
 			new Notice("Summary added to note.");
 		} catch (error) {
 			if (error instanceof LLMError) {
-				new Notice(`LLM Error: ${error.message}`);
+				new Notice(`LLM Error: ${error.message}`, 0);
 			} else if (error instanceof Error) {
-				new Notice(`Error: ${error.message}`);
+				new Notice(`Error: ${error.message}`, 0);
 			} else {
-				new Notice("An unexpected error occurred.");
+				new Notice("An unexpected error occurred.", 0);
 			}
 			console.error("Note summarization failed:", error);
 		}

@@ -137,11 +137,13 @@ export class ReviewSettingsTab extends PluginSettingTab {
 						this.plugin.settings.llm.baseUrl = "https://api.openai.com";
 						this.plugin.settings.llm.endpointPath = "/v1/chat/completions";
 						this.plugin.settings.llm.apiKeyHeaderName = "Authorization";
+						this.plugin.settings.llm.model = "gpt-5-mini";
 					} else {
 						this.plugin.settings.llm.baseUrl = "http://localhost:11434";
 						this.plugin.settings.llm.endpointPath = "/api/chat";
 						this.plugin.settings.llm.apiKeyHeaderName = undefined;
 						this.plugin.settings.llm.apiKeyHeaderValue = undefined;
+						this.plugin.settings.llm.model = "llama3.1";
 					}
 					await this.plugin.saveSettings();
 					this.display();

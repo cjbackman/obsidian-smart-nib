@@ -47,8 +47,7 @@ export function buildRequestBody(
 	if (config.provider === "openai") {
 		return {
 			...base,
-			temperature: config.temperature,
-			max_tokens: config.maxTokens,
+			max_completion_tokens: config.maxTokens,
 		};
 	}
 
@@ -147,7 +146,12 @@ export async function callLLM(config: LLMConfig, prompt: string): Promise<string
 			});
 
 			if (response.status >= 400) {
-				throw new LLMError(`LLM request failed: ${response.status}`);
+				const errorBody = (response.json as { error?: { message?: string } })?.error?.message
+					?? response.text
+					?? "";
+				throw new LLMError(
+					`LLM request failed (${response.status}): ${errorBody}`
+				);
 			}
 
 			return parseResponseContent(config.provider, response.json);
